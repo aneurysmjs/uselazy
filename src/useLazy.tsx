@@ -5,7 +5,11 @@ import { useState, useEffect, ReactElement } from 'react';
  */
 type DynamicImport = () => Promise<{ default: () => ReactElement }>;
 
-const useLazy = (getModule: DynamicImport, cond = false): (() => ReactElement) | null => {
+const useLazy = (
+  getModule: DynamicImport,
+  cond = false,
+  onFynally: () => void = (): void => {},
+): (() => ReactElement) | null => {
   const [AsyncModule, setAsyncModule] = useState<(() => ReactElement) | null>(null);
 
   useEffect(() => {
@@ -18,6 +22,8 @@ const useLazy = (getModule: DynamicImport, cond = false): (() => ReactElement) |
         setAsyncModule(() => module.default);
       } catch (err) {
         throw new Error(`useLazy error: ${err}`);
+      } finally {
+        onFynally();
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
