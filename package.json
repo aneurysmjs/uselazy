@@ -1,6 +1,6 @@
 {
   "name": "uselazy",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "main": "build/index.js",
   "repository": "git@github.com:aneurysmjs/uselazy.git",
   "author": "jero <aneurysmjs@outlook.com>",
