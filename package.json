@@ -1,7 +1,7 @@
 {
   "name": "uselazy",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.0-development",
+  "main": "build/index.js",
   "repository": "git@github.com:aneurysmjs/uselazy.git",
   "author": "jero <aneurysmjs@outlook.com>",
   "license": "MIT",
@@ -11,7 +11,8 @@
     "nodemon": "node ./node_module/.bin/nodemon",
     "start": "cross-env NODE_ENV=development node scripts/start.js",
     "test": "node scripts/test.js --env=jsdom",
-    "webpack": "node_modules/.bin/webpack"
+    "webpack": "node_modules/.bin/webpack",
+    "semantic-release": "semantic-release"
   },
   "config": {
     "commitizen": {
@@ -48,7 +49,10 @@
     "jest": "24.9.0",
     "nodemon": "1.19.4",
     "prettier": "1.18.2",
+    "react-test-renderer": "16.11.0",
     "rimraf": "3.0.0",
+    "semantic-release": "^15.13.27",
+    "ts-jest": "24.1.0",
     "ts-loader": "6.2.0",
     "typescript": "3.6.4",
     "webpack": "4.41.2",
