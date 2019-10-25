@@ -1,7 +1,7 @@
 {
   "name": "uselazy",
   "version": "0.0.0-semantically-released",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "repository": "git@github.com:aneurysmjs/uselazy.git",
   "author": "jero <aneurysmjs@outlook.com>",
   "license": "MIT",
@@ -14,6 +14,9 @@
     "webpack": "node_modules/.bin/webpack",
     "semantic-release": "semantic-release"
   },
+  "files": [
+    "dist"
+  ],
   "config": {
     "commitizen": {
       "path": "node_modules/cz-conventional-changelog"
