@@ -7,7 +7,7 @@ const paths = require('../config/paths');
 const { logMessage, compilerPromise, findCompiler } = require('./utils');
 
 const build = async () => {
-  rimraf.sync(paths.build);
+  rimraf.sync(paths.dist);
 
   const [useLazyConfig] = webpackConfig;
   const multiCompiler = webpack([useLazyConfig]);
