@@ -63,3 +63,6 @@ typings/
 build/
 
 dist/
+
+# ignore Typescript's generated files
+types/
