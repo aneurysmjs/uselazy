@@ -27,7 +27,7 @@
     "noUnusedLocals": true,
     "declaration": true,
     "strict": true,
-    "declarationDir": "./types"
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["./src/__test__/**/**"]
 }
