@@ -1,16 +1,12 @@
-import { useState, useEffect, ReactElement } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect } from 'react';
 
-/**
- * @link https://stackoverflow.com/questions/52112948/whats-the-return-type-of-a-dynamic-import
- */
-type DynamicImport = () => Promise<{ default: () => ReactElement }>;
-
-const useLazy = (
-  getModule: DynamicImport,
+function useLazy<P>(
+  getModule: () => Promise<{ default: () => P }>,
   cond = false,
   onFynally: () => void = (): void => {},
-): (() => ReactElement) | null => {
-  const [AsyncModule, setAsyncModule] = useState<(() => ReactElement) | null>(null);
+): (() => P) | null {
+  const [AsyncModule, setAsyncModule] = useState<(() => P) | null>(null);
 
   useEffect(() => {
     (async (): Promise<void> => {
@@ -30,6 +26,6 @@ const useLazy = (
   }, [cond]);
 
   return AsyncModule;
-};
+}
 
 export default useLazy;
