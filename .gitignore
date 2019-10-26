@@ -61,7 +61,6 @@ typings/
 .next
 
 dist
-lib
 es
 
 # ignore Typescript's generated files

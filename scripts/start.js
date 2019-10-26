@@ -1,87 +1,72 @@
 const webpack = require('webpack');
-const nodemon = require('nodemon');
-const rimraf = require('rimraf');
+const express = require('express');
+const chalk = require('chalk');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
 
 const webpackConfig = require('../config/webpack-config')(process.env.NODE_ENV || 'development');
 const paths = require('../config/paths');
-const { logMessage, compilerPromise, findCompiler } = require('./utils');
+const {
+  logMessage,
+  makeCompilerPromise,
+  findCompiler,
+} = require('./utils');
 
-const start = async () => {
-  rimraf.sync(paths.build);
+const app = express();
 
+const PORT = process.env.PORT || 8500;
+
+const DEVSERVER_HOST = process.env.DEVSERVER_HOST || 'http://localhost';
+
+(async () => {
   const [useLazyConfig] = webpackConfig;
+  useLazyConfig.entry.useLazy = [
+    `webpack-hot-middleware/client?path=${DEVSERVER_HOST}:${PORT}/__webpack_hmr`,
+    ...useLazyConfig.entry.useLazy,
+  ];
 
-  const multiCompiler = webpack([useLazyConfig]);
+  useLazyConfig.output.hotUpdateMainFilename = 'updates/[hash].hot-update.json';
+  useLazyConfig.output.hotUpdateChunkFilename = 'updates/[id].[hash].hot-update.js';
 
-  const getCompiler = findCompiler(multiCompiler);
-
-  const useLazyCompiler = getCompiler('useLazy');
-
-  const useLazyPromise = compilerPromise('useLazy', useLazyCompiler);
+  const webpackCompiler = webpack([useLazyConfig]);
+  const clientCompiler = findCompiler(webpackCompiler)('useLazy');
+  const [clientPromise] = makeCompilerPromise([clientCompiler]);
 
   const watchOptions = {
-    // poll: true,
     ignored: /node_modules/,
-    stats: {
-      cached: false,
-      cachedAssets: false,
-      chunks: false,
-      chunkModules: false,
-      colors: true,
-      hash: false,
-      modules: false,
-      reasons: false,
-      timings: true,
-      version: false,
-    },
+    stats: useLazyConfig.stats,
   };
 
-  useLazyCompiler.watch(watchOptions, (error, stats) => {
-    if (!error && !stats.hasErrors()) {
-      // eslint-disable-next-line no-console
-      console.log(stats.toString(useLazyConfig.stats));
-      return;
-    }
-
-    if (error) {
-      logMessage(error, 'error');
-    }
-
-    if (stats.hasErrors()) {
-      const info = stats.toJson();
-      const errors = info.errors[0].split('\n');
-      logMessage(errors[0], 'error');
-      logMessage(errors[1], 'error');
-      logMessage(errors[2], 'error');
-    }
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    return next();
   });
 
-  // wait until client and blocks is compiled
+  app.use(
+    webpackDevMiddleware(clientCompiler, {
+      // publicPath: useLazyConfig.output.publicPath,
+      stats: useLazyConfig.stats,
+      watchOptions,
+    }),
+  );
+
+  app.use(webpackHotMiddleware(clientCompiler));
+
+  app.use('*', express.static(paths.dist));
+
   try {
-    await useLazyPromise;
+    await clientPromise;
+
+    app.listen(PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[${new Date().toISOString()}]`,
+        chalk.blue(
+          `App is running: ${process.env.HOST || 'http://localhost'}:${process.env.PORT || 8500}`,
+        ),
+      );
+    });
   } catch (error) {
     logMessage(error, 'error');
   }
-
-  const script = nodemon({
-    script: `${paths.build}/useLazy.js`,
-    ignore: ['src', 'scripts', 'config', './*.*'],
-  });
-
-  script.on('restart', () => {
-    logMessage('useLazy has been restarted.', 'warning');
-  });
-
-  script.on('quit', () => {
-    // eslint-disable-next-line no-console
-    console.log('Process ended');
-    process.exit();
-  });
-
-  script.on('error', () => {
-    logMessage('An error occured. Exiting', 'error');
-    process.exit(1);
-  });
-};
-
-start();
+})();
