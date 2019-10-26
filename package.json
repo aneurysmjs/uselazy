@@ -1,7 +1,6 @@
 {
   "name": "uselazy",
   "version": "0.0.0-semantically-released",
-  "main": "dist/index.js",
   "repository": "git@github.com:aneurysmjs/uselazy.git",
   "author": "jero <aneurysmjs@outlook.com>",
   "license": "MIT",
@@ -11,8 +10,14 @@
     "test": "node scripts/test.js --env=jsdom",
     "semantic-release": "semantic-release"
   },
+  "main": "dist/useLazy.js",
+  "unpkg": "dist/useLazy.js",
+  "module": "es/useLazy.js",
   "files": [
-    "dist"
+    "dist",
+    "lib",
+    "es",
+    "src"
   ],
   "config": {
     "commitizen": {
