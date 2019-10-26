@@ -10,6 +10,12 @@
     "test": "node scripts/test.js --env=jsdom",
     "semantic-release": "semantic-release"
   },
+  "keywords": [
+    "lazy loading",
+    "useLazy",
+    "lazy hook",
+    "react lazy hook"
+  ],
   "main": "dist/useLazy.js",
   "unpkg": "dist/useLazy.js",
   "module": "es/useLazy.js",
