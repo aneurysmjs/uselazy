@@ -9,7 +9,6 @@
     "airbnb-base",
     "plugin:@typescript-eslint/recommended", 
     "plugin:react/recommended",
-    // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended",
     "plugin:import/errors",
@@ -26,11 +25,6 @@
     "react": {
       "version": "detect"
     },
-    "import/resolver": {
-      "webpack": {
-        "config": "./config/webpack-config/index.js"
-      }
-    }
   },
   "parserOptions":  {
     "ecmaVersion": 2018,  // Allows for the parsing of modern ECMAScript features
@@ -39,7 +33,6 @@
   "rules": {
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/explicit-function-return-type": ["error", {
-      // "allowExpressions": true,
       "allowTypedFunctionExpressions": true
     }],
     "react/jsx-uses-vars": "error",

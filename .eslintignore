@@ -5,3 +5,4 @@
 config/**
 scripts/**
 jest.config.js
+rollup.config.js
