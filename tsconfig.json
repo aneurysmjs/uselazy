@@ -29,5 +29,4 @@
     "strict": true,
   },
   "include": ["./src/**/*"],
-  "exclude": ["./src/__test__/**/**"]
 }
