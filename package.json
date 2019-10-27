@@ -24,8 +24,7 @@
   "files": [
     "dist",
     "lib",
-    "es",
-    "src"
+    "es"
   ],
   "config": {
     "commitizen": {
