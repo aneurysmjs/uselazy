@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+import handleThrow from './utils/handleThrow';
+
 function useLazy<P>(
   getModule: () => Promise<{ default: () => P }>,
   cond = false,
@@ -16,7 +18,7 @@ function useLazy<P>(
         const module = await getModule();
         setAsyncModule(() => module.default);
       } catch (err) {
-        throw new Error(`useLazy error: ${err}`);
+        setAsyncModule(err);
       } finally {
         onFynally();
       }
@@ -24,7 +26,7 @@ function useLazy<P>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cond]);
 
-  return AsyncModule;
+  return handleThrow(AsyncModule);
 }
 
 export default useLazy;
