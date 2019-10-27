@@ -5,6 +5,7 @@
   "author": "jero <aneurysmjs@outlook.com>",
   "license": "MIT",
   "scripts": {
+    "clean": "./node_modules/.bin/rimraf dist es",
     "build": "rollup -c",
     "commit": "git-cz",
     "test": "node scripts/test.js --env=jsdom",
