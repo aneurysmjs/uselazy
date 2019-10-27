@@ -9,7 +9,8 @@
     "build": "yarn clean && rollup -c",
     "commit": "git-cz",
     "test": "node scripts/test.js --env=jsdom",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "lint": "eslint './src/**/*.{ts,tsx}'"
   },
   "keywords": [
     "lazy loading",
