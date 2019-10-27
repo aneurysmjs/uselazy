@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "./node_modules/.bin/rimraf dist es",
-    "build": "rollup -c",
+    "build": "yarn clean && rollup -c",
     "commit": "git-cz",
     "test": "node scripts/test.js --env=jsdom",
     "semantic-release": "semantic-release"
