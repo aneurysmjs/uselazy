@@ -4,5 +4,7 @@
 
 config/**
 scripts/**
+dist/**
+es/**
 jest.config.js
 rollup.config.js
