@@ -8,12 +8,14 @@ import pkg from './package.json';
 
 const noDeclarationFiles = { compilerOptions: { declaration: false } };
 
+const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
+
 export default [
   // ES
   {
     input: 'src/index.tsx',
     output: { file: 'es/useLazy.js', format: 'es', indent: false },
-    external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
+    external,
     plugins: [
       commonjs({
         namedExports: {
@@ -30,7 +32,7 @@ export default [
   {
     input: 'src/index.tsx',
     output: { file: 'es/useLazy.mjs', format: 'es', indent: false },
-    external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
+    external,
     plugins: [
       commonjs({
         namedExports: {
@@ -66,7 +68,7 @@ export default [
         react: 'React',
       },
     },
-    external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
+    external,
     plugins: [
       commonjs({
         namedExports: {
@@ -95,8 +97,7 @@ export default [
         react: 'React',
       },
     },
-    
-    external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
+    external,
     plugins: [
       commonjs({
         namedExports: {
