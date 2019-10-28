@@ -50,7 +50,7 @@ export default Text;
 import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
-const App () => {
+const App = () => {
   const [cond, setCond] = useState(false);
   const SomeComponent = useLazy(
     () => import('./Text'),
