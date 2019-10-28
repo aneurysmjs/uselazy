@@ -6,11 +6,13 @@
   "license": "MIT",
   "scripts": {
     "clean": "./node_modules/.bin/rimraf dist es",
-    "build": "yarn clean && rollup -c",
+    "build": "rollup -c",
     "commit": "git-cz",
     "test": "node scripts/test.js --env=jsdom",
     "semantic-release": "semantic-release",
-    "lint": "eslint './src/**/*.{ts,tsx}'"
+    "lint": "eslint './src/**/*.{ts,tsx}'",
+    "pretest": "yarn build",
+    "prepare": "yarn clean clean && yarn lint && yarn test"
   },
   "keywords": [
     "lazy loading",
