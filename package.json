@@ -18,9 +18,9 @@
     "lazy hook",
     "react lazy hook"
   ],
-  "main": "dist/useLazy.js",
-  "unpkg": "dist/useLazy.js",
-  "module": "es/useLazy.js",
+  "main": "dist/uselazy.js",
+  "unpkg": "dist/uselazy.js",
+  "module": "es/uselazy.js",
   "files": [
     "dist",
     "lib",

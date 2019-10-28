@@ -14,7 +14,11 @@ export default [
   // ES
   {
     input: 'src/index.tsx',
-    output: { file: 'es/useLazy.js', format: 'es', indent: false },
+    output: {
+      file: 'es/uselazy.js',
+      format: 'es',
+      indent: false
+    },
     external,
     plugins: [
       commonjs({
@@ -31,7 +35,7 @@ export default [
   // ES for Browsers
   {
     input: 'src/index.tsx',
-    output: { file: 'es/useLazy.mjs', format: 'es', indent: false },
+    output: { file: 'es/uselazy.mjs', format: 'es', indent: false },
     external,
     plugins: [
       commonjs({
@@ -60,7 +64,7 @@ export default [
   {
     input: 'src/index.tsx',
     output: {
-      file: 'dist/useLazy.js',
+      file: 'dist/uselazy.js',
       format: 'umd',
       name: 'useLazy',
       indent: false,
@@ -89,7 +93,7 @@ export default [
   {
     input: 'src/index.tsx',
     output: {
-      file: 'dist/useLazy.min.js',
+      file: 'dist/uselazy.min.js',
       format: 'umd',
       name: 'useLazy',
       indent: false,
