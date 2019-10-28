@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 
 import handleThrow from './utils/handleThrow';
 
+type GetModuleType<P> = () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P }>>;
+
 function useLazy<P>(
-  getModule: () => Promise<{ default: () => P }>,
+  getModule: GetModuleType<P>,
   cond = false,
   onFynally: () => void = (): void => {},
-): (() => P) | null {
-  const [AsyncModule, setAsyncModule] = useState<(() => P) | null>(null);
+): (() => P) | Array<() => P> | null {
+  const [AsyncModule, setAsyncModule] = useState<(() => P) | Array<() => P> | null>(null);
 
   useEffect(() => {
     (async (): Promise<void> => {
@@ -16,7 +18,15 @@ function useLazy<P>(
           return;
         }
         const module = await getModule();
-        setAsyncModule(() => module.default);
+
+        if (module instanceof Array) {
+          const modules = await Promise.all(module);
+          setAsyncModule(modules.map(m => m.default));
+        }
+
+        if ('default' in module) {
+          setAsyncModule(() => module.default);
+        }
       } catch (err) {
         setAsyncModule(err);
       } finally {

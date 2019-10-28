@@ -65,7 +65,7 @@ const App = () => {
         Buy me a beer 
       </button>
 
-      {/* at first the condition is false */}
+      {/* at first is null the condition is false */}
       {SomeComponent && <SomeComponent />}
     </div>
   );

@@ -1,11 +1,16 @@
+/* eslint-disable @typescript-eslint/indent */
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { renderHook } from '@testing-library/react-hooks';
 
 import useLazy from '../useLazy';
 
-type DynamicModule = () => Promise<typeof import('./Example')>;
+type ExampleModule = () => Promise<typeof import('./Example')>;
 
-const getModule: DynamicModule = () => import('./Example');
+type GetModules = () => Array<
+  Promise<typeof import('./Example') | typeof import('./AnotherExample')>
+>;
+const getModule: ExampleModule = () => import('./Example');
+const getModules: GetModules = () => [import('./Example'), import('./AnotherExample')];
 
 describe('LazyComponent', () => {
   it('should render "null" at first and then resolve promise', async () => {
@@ -29,6 +34,23 @@ describe('LazyComponent', () => {
     expect(typeof result.current).toBe('function');
     expect(handleFinally).toHaveBeenCalledTimes(1);
   });
+
+  it('should now how to handle and array of promises', async () => {
+    const handleFinally = jest.fn();
+    const { result, waitForNextUpdate } = renderHook(() =>
+      // @ts-ignore
+      useLazy(getModules, true, handleFinally),
+    );
+    expect(result.current).toEqual(null);
+
+    await waitForNextUpdate();
+
+    expect(Array.isArray(result.current)).toBe(true);
+    // @ts-ignore
+    expect(result.current.every(f => typeof f === 'function')).toBe(true);
+    expect(handleFinally).toHaveBeenCalledTimes(1);
+  });
+
   it('should throw', async () => {
     // @ts-ignore - just for testing purposes
     type WrongModule = typeof import('./wrong/Example');
