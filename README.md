@@ -38,7 +38,7 @@ type useLazy<P> = (
 ```
 ## Usage
 
-``` javascript
+``` jsx
 // Text.tsx
 import React from 'react'
 
