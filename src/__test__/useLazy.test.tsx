@@ -10,11 +10,17 @@ type GetModules = () => Array<
   Promise<typeof import('./Example') | typeof import('./AnotherExample')>
 >;
 const getModule: ExampleModule = () => import('./Example');
+
 const getModules: GetModules = () => [import('./Example'), import('./AnotherExample')];
 
 describe('LazyComponent', () => {
   it('should render "null" at first and then resolve promise', async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useLazy(getModule, true));
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useLazy({
+        getModule,
+        shouldImport: true,
+      }),
+    );
     expect(result.current).toEqual(null);
 
     await waitForNextUpdate();
@@ -25,7 +31,13 @@ describe('LazyComponent', () => {
 
   it('should call "finally" handler when the promised is resolve', async () => {
     const handleFinally = jest.fn();
-    const { result, waitForNextUpdate } = renderHook(() => useLazy(getModule, true, handleFinally));
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useLazy({
+        getModule,
+        shouldImport: true,
+        onFynally: handleFinally,
+      }),
+    );
     expect(result.current).toEqual(null);
 
     await waitForNextUpdate();
@@ -38,8 +50,11 @@ describe('LazyComponent', () => {
   it('should now how to handle and array of promises', async () => {
     const handleFinally = jest.fn();
     const { result, waitForNextUpdate } = renderHook(() =>
-      // @ts-ignore
-      useLazy(getModules, true, handleFinally),
+      useLazy({
+        getModule: getModules,
+        shouldImport: true,
+        onFynally: handleFinally,
+      }),
     );
     expect(result.current).toEqual(null);
 
@@ -57,7 +72,12 @@ describe('LazyComponent', () => {
     // @ts-ignore - just for testing purposes
     const wrongModule = (): WrongModule => import('./wrong/Example'); // eslint-disable-line import/no-unresolved
 
-    const { result, waitForNextUpdate } = renderHook(() => useLazy(wrongModule, true));
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useLazy({
+        getModule: wrongModule,
+        shouldImport: true,
+      }),
+    );
 
     await waitForNextUpdate();
 

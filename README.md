@@ -1,8 +1,8 @@
 # uselazy
 
-react hook for lazy load and code-split react components for further use.
+react hook for lazy load and code-split react components or whatever you want.
 
-NOTE: at the moment this ONLY support dynamic imports where's a default export.
+NOTE: at the moment this ONLY supports dynamic imports for React components where's a default export.
 
 named exports will be handle soon.
 
@@ -27,14 +27,17 @@ or
 ## API
 
 ```typescript 
-type useLazy<P> = (
+/**
+ * this is the object that useLazy accepts
+ */
+interface LazyObj<P> {
   // function that returns a promise from a dynamic import
-  getModule: () => Promise<{ default: () => P }>, 
+  getModule: () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P }>>;
   // this is were you decided when to execute the import
-  condition: boolean, 
+  shouldImport: boolean;
   // (OPTIONAL) do something after all has been loaded
-  onFynally?: () => void, 
-) => P | null
+  onFynally?: () => void;
+}
 ```
 ## Usage
 
@@ -52,11 +55,11 @@ import useLazy from 'uselazy';
 
 const App = () => {
   const [cond, setCond] = useState(false);
-  const SomeComponent = useLazy(
-    () => import('./Text'),
-    cond,
-    () => console.log('ахуититиьна')
-  );
+  const SomeComponent = useLazy({
+    getModule: () => import('./Text'),
+    shouldImport: cond,
+    onFynally: () => console.log('ахуититиьна')
+  });
 
   return (
     <div>
@@ -94,11 +97,11 @@ import useLazy from 'uselazy';
 
 const App = () => {
   const [cond, setCond] = useState(false);
-  const Components = useLazy(
-    () => [import('./Text'), import('./AnotherText')],
-    cond,
-    () => console.log('ахуититиьна')
-  );
+   const Comonents = useLazy({
+    getModule: () => [import('./Text'), import('./AnotherText')],
+    shouldImport: cond,
+    onFynally: () => console.log('ахуититиьна')
+  });
 
   return (
     <div>

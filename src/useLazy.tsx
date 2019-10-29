@@ -2,19 +2,28 @@ import { useState, useEffect } from 'react';
 
 import handleThrow from './utils/handleThrow';
 
-type GetModuleType<P> = () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P }>>;
+interface LazyObj<P> {
+  getModule: () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P | P }>>;
+  shouldImport: boolean;
+  onFynally?: () => void;
+}
 
-function useLazy<P>(
-  getModule: GetModuleType<P>,
-  cond = false,
-  onFynally: () => void = (): void => {},
-): (() => P) | Array<() => P> | null {
+/**
+ * is much better to have all in one object, that allows the arguments to come
+ * in any order and if there's anyone we don't need, we can simply ignore them
+ * or anything that is missing we can simply provide defaults
+ */
+function useLazy<P>({
+  getModule,
+  shouldImport = false,
+  onFynally = (): void => {},
+}: LazyObj<P>): (() => P) | Array<() => P> | null {
   const [AsyncModule, setAsyncModule] = useState<(() => P) | Array<() => P> | null>(null);
 
   useEffect(() => {
     (async (): Promise<void> => {
       try {
-        if (!cond) {
+        if (!shouldImport) {
           return;
         }
         const module = await getModule();
@@ -34,7 +43,7 @@ function useLazy<P>(
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cond]);
+  }, [shouldImport]);
 
   return handleThrow(AsyncModule);
 }
