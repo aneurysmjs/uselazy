@@ -55,7 +55,7 @@ import useLazy from 'uselazy';
 
 const App = () => {
   const [cond, setCond] = useState(false);
-  const SomeComponent = useLazy({
+  const { isLoading, result: SomeComponent } = useLazy({
     getModule: () => import('./Text'),
     shouldImport: cond,
     onFynally: () => console.log('ахуититиьна')
@@ -67,6 +67,8 @@ const App = () => {
       <button onClick={() => setCond(!cond)}>
         Buy me a beer 
       </button>
+
+      {isLoading && <span>some spinner</span>}
 
       {SomeComponent && <SomeComponent />}
     </div>
@@ -97,7 +99,7 @@ import useLazy from 'uselazy';
 
 const App = () => {
   const [cond, setCond] = useState(false);
-   const Comonents = useLazy({
+  const { isLoading, result: Components } = useLazy({
     getModule: () => [import('./Text'), import('./AnotherText')],
     shouldImport: cond,
     onFynally: () => console.log('ахуититиьна')
@@ -109,6 +111,8 @@ const App = () => {
       <button onClick={() => setCond(!cond)}>
         Buy me lots of beers
       </button>
+
+      {isLoading && <span>some spinner</span>}
 
       {Components && Components.map(Component => <Component />)}
     </div>

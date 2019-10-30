@@ -15,103 +15,120 @@ const getModules: GetModules = () => [import('./Example'), import('./AnotherExam
 
 describe('LazyComponent', () => {
   it('should render "null" at first and then resolve promise', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
       useLazy({
         getModule,
         shouldImport: true,
       }),
     );
-    expect(result.current).toEqual(null);
+
+    expect(renderHookResult.current.isLoading).toEqual(true);
+    expect(renderHookResult.current.result).toEqual(null);
 
     await waitForNextUpdate();
 
-    expect(result.current).not.toBe(undefined);
-    expect(typeof result.current).toBe('function');
+    expect(renderHookResult.current.isLoading).toEqual(false);
+    expect(renderHookResult.current.result).not.toBe(undefined);
+    expect(typeof renderHookResult.current.result).toBe('function');
   });
 
   it('should call "finally" handler when the promised is resolve', async () => {
     const handleFinally = jest.fn();
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
       useLazy({
         getModule,
         shouldImport: true,
         onFynally: handleFinally,
       }),
     );
-    expect(result.current).toEqual(null);
+
+    expect(renderHookResult.current.isLoading).toEqual(true);
+    expect(renderHookResult.current.result).toEqual(null);
 
     await waitForNextUpdate();
 
-    expect(result.current).not.toBe(undefined);
-    expect(typeof result.current).toBe('function');
+    expect(renderHookResult.current.isLoading).toEqual(false);
+    expect(renderHookResult.current.result).not.toBe(undefined);
+    expect(typeof renderHookResult.current.result).toBe('function');
     expect(handleFinally).toHaveBeenCalledTimes(1);
   });
 
   it('should now how to handle and array of promises', async () => {
     const handleFinally = jest.fn();
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
       useLazy({
         getModule: getModules,
         shouldImport: true,
         onFynally: handleFinally,
       }),
     );
-    expect(result.current).toEqual(null);
+
+    expect(renderHookResult.current.isLoading).toEqual(true);
+    expect(renderHookResult.current.result).toEqual(null);
 
     await waitForNextUpdate();
 
-    expect(Array.isArray(result.current)).toBe(true);
+    expect(renderHookResult.current.isLoading).toEqual(false);
+    expect(Array.isArray(renderHookResult.current.result)).toBe(true);
     // @ts-ignore
-    expect(result.current.every(f => typeof f === 'function')).toBe(true);
+    expect(renderHookResult.current.result.every(f => typeof f === 'function')).toBe(true);
     expect(handleFinally).toHaveBeenCalledTimes(1);
   });
 
   describe('handle exceptions', () => {
     it('should throw for a single import', async () => {
-      // @ts-ignore - just for testing purposes
+      // @ts-ignore - just to avoid Typescript's "can't find module"
       type WrongModule = typeof import('./wrong/Example');
-      // @ts-ignore - just for testing purposes
+      // @ts-ignore - just to avoid Typescript's "can't find module"
       const wrongModule = (): WrongModule => import('./wrong/Example'); // eslint-disable-line import/no-unresolved
 
-      const { result, waitForNextUpdate } = renderHook(() =>
+      const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
         useLazy({
           getModule: wrongModule,
           shouldImport: true,
         }),
       );
 
+      expect(renderHookResult.current.isLoading).toEqual(true);
+
       await waitForNextUpdate();
 
       expect(() => {
-        expect(result.current).not.toBe(undefined);
+        expect(renderHookResult.current.result).not.toBe(undefined);
       }).toThrow(
+        Error(`useLazy Error: Cannot find module './wrong/Example' from 'useLazy.test.tsx'`),
+      );
+
+      expect(renderHookResult.error).toEqual(
         Error(`useLazy Error: Cannot find module './wrong/Example' from 'useLazy.test.tsx'`),
       );
     });
 
     it('should throw for multiple imports', async () => {
       type WrongModules = () => Array<
-        // @ts-ignore
+        // @ts-ignore - just to avoid Typescript's "can't find module"
         Promise<typeof import('./Example') | typeof import('./AnotherWrongModule')>
       >;
 
       const wrongModules: WrongModules = () => [
         import('./Example'),
-        // @ts-ignore
+        // @ts-ignore - just to avoid Typescript's "can't find module"
         import('./AnotherWrongModule'), // eslint-disable-line import/no-unresolved
       ];
 
-      const { result, waitForNextUpdate } = renderHook(() =>
+      const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
         useLazy({
           getModule: wrongModules,
           shouldImport: true,
         }),
       );
 
+      expect(renderHookResult.current.isLoading).toEqual(true);
+
       await waitForNextUpdate();
 
       expect(() => {
-        expect(result.current).not.toBe(undefined);
+        expect(renderHookResult.current.result).not.toBe(undefined);
       }).toThrow(
         Error(`useLazy Error: Cannot find module './AnotherWrongModule' from 'useLazy.test.tsx'`),
       );

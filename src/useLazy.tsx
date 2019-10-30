@@ -8,17 +8,22 @@ interface LazyObj<P> {
   onFynally?: () => void;
 }
 
-/**
- * is much better to have all in one object, that allows the arguments to come
- * in any order and if there's anyone we don't need, we can simply ignore them
- * or anything that is missing we can simply provide defaults
- */
+interface UseLazyResult<P> {
+  isLoading: boolean;
+  result: (() => P) | Array<() => P> | null;
+}
+
+const initialState = {
+  isLoading: false,
+  result: null,
+};
+
 function useLazy<P>({
   getModule,
   shouldImport = false,
   onFynally = (): void => {},
-}: LazyObj<P>): (() => P) | Array<() => P> | null {
-  const [AsyncModule, setAsyncModule] = useState<(() => P) | Array<() => P> | null>(null);
+}: LazyObj<P>): UseLazyResult<P> {
+  const [AsyncModule, setAsyncModule] = useState<UseLazyResult<P>>(initialState);
 
   useEffect(() => {
     (async (): Promise<void> => {
@@ -26,15 +31,27 @@ function useLazy<P>({
         if (!shouldImport) {
           return;
         }
+
+        setAsyncModule({
+          isLoading: true,
+          result: null,
+        });
+
         const module = await getModule();
 
         if (module instanceof Array) {
           const modules = await Promise.all(module);
-          setAsyncModule(modules.map(m => m.default));
+          setAsyncModule({
+            isLoading: false,
+            result: modules.map(m => m.default),
+          });
         }
 
         if ('default' in module) {
-          setAsyncModule(() => module.default);
+          setAsyncModule({
+            isLoading: false,
+            result: module.default,
+          });
         }
       } catch (err) {
         setAsyncModule(err);
