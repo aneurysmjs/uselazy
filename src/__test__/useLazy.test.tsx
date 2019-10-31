@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/indent, @typescript-eslint/ban-ts-ignore */
 import { renderHook } from '@testing-library/react-hooks';
 
+import { ReactElement } from 'react';
+
 import useLazy from '../useLazy';
 
-type ExampleModule = () => Promise<typeof import('./Example')>;
+// type ExampleModule = () => Promise<typeof import('./Example')>;
+type ExampleModule = () => Promise<{ default: () => ReactElement }>;
 
 const getModule: ExampleModule = () => import('./Example');
 
-type GetModules = () => Array<
-  Promise<typeof import('./Example') | typeof import('./AnotherExample')>
->;
+type GetModules = () => Array<Promise<{ default: () => ReactElement }>>;
 
 const getModules: GetModules = () => [import('./Example'), import('./AnotherExample')];
 
@@ -73,6 +74,64 @@ describe('LazyComponent', () => {
     // @ts-ignore
     expect(renderHookResult.current.result.every(f => typeof f === 'function')).toBe(true);
     expect(handleFinally).toHaveBeenCalledTimes(1);
+  });
+
+  describe('import other stuff besided React components', () => {
+    it('should import a common function', async () => {
+      type SomeUtil = () => Promise<{ default: (message: string, reason: string) => string }>;
+
+      const getUtil: SomeUtil = () => import('./utilExample');
+
+      const handleFinally = jest.fn();
+      const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
+        useLazy({
+          getModule: getUtil,
+          shouldImport: true,
+          onFynally: handleFinally,
+        }),
+      );
+
+      expect(renderHookResult.current.isLoading).toEqual(true);
+      expect(renderHookResult.current.result).toEqual(null);
+
+      await waitForNextUpdate();
+
+      expect(renderHookResult.current.isLoading).toEqual(false);
+      expect(renderHookResult.current.result).not.toBe(undefined);
+      expect(typeof renderHookResult.current.result).toBe('function');
+      // @ts-ignore - avoid Object is possibly "null" since it won't be like that
+      expect(renderHookResult.current.result('очень', 'круто')).toBe('очень круто');
+      expect(handleFinally).toHaveBeenCalledTimes(1);
+    });
+
+    it('should import an object', async () => {
+      type UtilExample = () => Promise<{ default: { name: string; hobby: string } }>;
+
+      const getUtil: UtilExample = () => import('./objectExample');
+
+      const handleFinally = jest.fn();
+      const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
+        useLazy({
+          getModule: getUtil,
+          shouldImport: true,
+          onFynally: handleFinally,
+        }),
+      );
+
+      expect(renderHookResult.current.isLoading).toEqual(true);
+      expect(renderHookResult.current.result).toEqual(null);
+
+      await waitForNextUpdate();
+
+      expect(renderHookResult.current.isLoading).toEqual(false);
+      expect(renderHookResult.current.result).not.toBe(undefined);
+      expect(typeof renderHookResult.current.result).toBe('object');
+      expect(renderHookResult.current.result).toStrictEqual({
+        name: 'Джеро',
+        hobby: 'программирование',
+      });
+      expect(handleFinally).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('handle exceptions', () => {

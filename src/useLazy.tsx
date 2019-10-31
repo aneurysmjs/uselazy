@@ -2,15 +2,29 @@ import { useState, useEffect } from 'react';
 
 import handleThrow from './utils/handleThrow';
 
-interface LazyObj<P> {
-  getModule: () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P | P }>>;
+/**
+ * I've learned this here:
+ * @link https://github.com/Microsoft/TypeScript/pull/24897
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface SomeFn<U, V extends any[] = any[]> {
+  (param: U, ...rest: V): U | V;
+}
+
+interface LazyObj<T> {
+  /* eslint-disable @typescript-eslint/indent */
+  getModule: () =>
+    | Promise<{ default: T }>
+    | Promise<{ default: SomeFn<T> }>
+    | Array<Promise<{ default: SomeFn<T> }>>;
+  /* eslint-enable @typescript-eslint/indent */
   shouldImport: boolean;
   onFynally?: () => void;
 }
 
-interface UseLazyResult<P> {
+interface UseLazyResult<T> {
   isLoading: boolean;
-  result: (() => P) | Array<() => P> | null;
+  result: T | (SomeFn<T>) | Array<SomeFn<T>> | null;
 }
 
 const initialState = {
@@ -18,12 +32,12 @@ const initialState = {
   result: null,
 };
 
-function useLazy<P>({
+function useLazy<T>({
   getModule,
   shouldImport = false,
   onFynally = (): void => {},
-}: LazyObj<P>): UseLazyResult<P> {
-  const [AsyncModule, setAsyncModule] = useState<UseLazyResult<P>>(initialState);
+}: LazyObj<T>): UseLazyResult<T> {
+  const [AsyncModule, setAsyncModule] = useState<UseLazyResult<T>>(initialState);
 
   useEffect(() => {
     (async (): Promise<void> => {

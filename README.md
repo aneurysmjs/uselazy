@@ -119,7 +119,49 @@ const App = () => {
   );
 };
 ```
+### or other stuff rather than React components
 
+``` jsx
+// someUtils.ts
+import React from 'react';
+
+const someUtils = {
+  byMoreBeers(cuantity: number): string {
+    return `${cuantity} beers on the way ;)`
+  },
+}
+
+export default someUtils;
+
+// App.tsx
+import React, { useState } from 'react';
+import useLazy from 'uselazy';
+
+const App = () => {
+  const [cond, setCond] = useState(false);
+  const { isLoading, result: utils } = useLazy({
+    getModule: () => import('./someUtils'),
+    shouldImport: cond,
+  });
+
+  return (
+    <div>
+      <button onClick={() => setCond(!cond)}>
+        Buy me lots of beers
+      </button>
+
+      {utils && (
+        <button onClick={() => utils.byMoreBeers(5)}>
+          Buy me more beers for my friends!
+        </button>
+      )}
+
+      {isLoading && <span>some spinner</span>}
+
+    </div>
+  );
+};
+```
 
 ## LICENSE
 
