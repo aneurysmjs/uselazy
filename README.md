@@ -36,7 +36,7 @@ interface LazyObj<P> {
   // this is were you decided when to execute the import
   shouldImport: boolean;
   // (OPTIONAL) do something after all has been loaded
-  onFynally?: () => void;
+  onFinally?: () => void;
 }
 ```
 ## Usage
@@ -58,7 +58,7 @@ const App = () => {
   const { isLoading, result: SomeComponent } = useLazy({
     getModule: () => import('./Text'),
     shouldImport: cond,
-    onFynally: () => console.log('ахуититиьна')
+    onFinally: () => console.log('ахуититиьна')
   });
 
   return (
