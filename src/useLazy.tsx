@@ -11,32 +11,24 @@ interface SomeFn<U, V extends any[] = any[]> {
   (param: U, ...rest: V): U | V;
 }
 
-interface LazyObj<T> {
-  /* eslint-disable @typescript-eslint/indent */
-  getModule: () =>
-    | Promise<{ default: T }>
-    | Promise<{ default: SomeFn<T> }>
-    | Array<Promise<{ default: SomeFn<T> }>>;
-  /* eslint-enable @typescript-eslint/indent */
-  shouldImport: boolean;
-  onFinally?: () => void;
-}
-
 interface UseLazyResult<T> {
   isLoading: boolean;
-  result: T | (SomeFn<T>) | Array<SomeFn<T>> | null;
+  result: T | SomeFn<T> | Array<SomeFn<T>> | null;
 }
+
+/* eslint-disable @typescript-eslint/indent */
+type GetModule<T> = () =>
+  | Promise<{ default: T }>
+  | Promise<{ default: SomeFn<T> }>
+  | Array<Promise<{ default: SomeFn<T> }>>;
+/* eslint-enable @typescript-eslint/indent */
 
 const initialState = {
   isLoading: false,
   result: null,
 };
 
-function useLazy<T>({
-  getModule,
-  shouldImport = false,
-  onFinally = (): void => {},
-}: LazyObj<T>): UseLazyResult<T> {
+function useLazy<T>(getModule: GetModule<T>, shouldImport = false): UseLazyResult<T> {
   const [AsyncModule, setAsyncModule] = useState<UseLazyResult<T>>(initialState);
 
   useEffect(() => {
@@ -69,12 +61,9 @@ function useLazy<T>({
         }
       } catch (err) {
         setAsyncModule(err);
-      } finally {
-        onFinally();
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldImport]);
+  }, []);
 
   return handleThrow(AsyncModule);
 }

@@ -26,18 +26,14 @@ or
 
 ## API
 
-```typescript 
-/**
- * this is the object that useLazy accepts
- */
-interface LazyObj<P> {
-  // function that returns a promise from a dynamic import
-  getModule: () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P }>>;
-  // this is were you decided when to execute the import
-  shouldImport: boolean;
-  // (OPTIONAL) do something after all has been loaded
-  onFinally?: () => void;
-}
+```typescript
+  // This it whats takes useLazy:
+  useLazy(
+    // function that returns a promise from a dynamic import
+    getModule: () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P }>>,
+    // this is were you decided when to execute the import
+    shouldImport: boolean
+  );
 ```
 ## Usage
 
@@ -54,17 +50,16 @@ import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
 const App = () => {
-  const [cond, setCond] = useState(false);
-  const { isLoading, result: SomeComponent } = useLazy({
-    getModule: () => import('./Text'),
-    shouldImport: cond,
-    onFinally: () => console.log('ахуититиьна')
-  });
+  const [shouldImport, setShouldImport] = useState(false);
+  const { isLoading, result: SomeComponent } = useLazy(
+    () => import('./Text'),
+    shouldImport
+  );
 
   return (
     <div>
       <h1>I'm very lazy </h1>
-      <button onClick={() => setCond(!cond)}>
+      <button onClick={() => setShouldImport(!shouldImport)}>
         Buy me a beer 
       </button>
 
@@ -98,17 +93,16 @@ import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
 const App = () => {
-  const [cond, setCond] = useState(false);
-  const { isLoading, result: Components } = useLazy({
-    getModule: () => [import('./Text'), import('./AnotherText')],
-    shouldImport: cond,
-    onFynally: () => console.log('ахуититиьна')
-  });
+  const [shouldImport, setShouldImport] = useState(false);
+  const { isLoading, result: Components } = useLazy(
+    () => [import('./Text'), import('./AnotherText')],
+    shouldImport
+  );
 
   return (
     <div>
       <h1>I'm very lazy </h1>
-      <button onClick={() => setCond(!cond)}>
+      <button onClick={() => setShouldImport(!shouldImport)}>
         Buy me lots of beers
       </button>
 
@@ -138,15 +132,15 @@ import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
 const App = () => {
-  const [cond, setCond] = useState(false);
-  const { isLoading, result: utils } = useLazy({
-    getModule: () => import('./someUtils'),
-    shouldImport: cond,
-  });
+  const [shouldImport, setShouldImport] = useState(false);
+  const { isLoading, result: utils } = useLazy(
+    () => import('./someUtils'),
+    shouldImport
+  );
 
   return (
     <div>
-      <button onClick={() => setCond(!cond)}>
+      <button onClick={() => setShouldImport(!shouldImport)}>
         Buy me lots of beers
       </button>
 

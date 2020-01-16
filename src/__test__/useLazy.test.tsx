@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/indent, @typescript-eslint/ban-ts-ignore */
 import { renderHook } from '@testing-library/react-hooks';
 
-import { ReactElement } from 'react';
+import React, { ReactElement, FunctionComponent } from 'react';
 
 import useLazy from '../useLazy';
 
@@ -14,13 +14,17 @@ type GetModules = () => Array<Promise<{ default: () => ReactElement }>>;
 
 const getModules: GetModules = () => [import('./Example'), import('./AnotherExample')];
 
+// eslint-disable-next-line react/prop-types
+const SomeWrapper: FunctionComponent = ({ children }) => <div>{children}</div>;
+
 describe('LazyComponent', () => {
   it('should render "null" at first and then resolve promise', async () => {
-    const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-      useLazy({
-        getModule,
-        shouldImport: true,
-      }),
+    const shouldImport = true;
+    const { result: renderHookResult, waitForNextUpdate } = renderHook(
+      () => useLazy(getModule, shouldImport),
+      {
+        wrapper: SomeWrapper,
+      },
     );
 
     expect(renderHookResult.current.isLoading).toEqual(true);
@@ -31,37 +35,12 @@ describe('LazyComponent', () => {
     expect(renderHookResult.current.isLoading).toEqual(false);
     expect(renderHookResult.current.result).not.toBe(undefined);
     expect(typeof renderHookResult.current.result).toBe('function');
-  });
-
-  it('should call "finally" handler when the promised is resolve', async () => {
-    const handleFinally = jest.fn();
-    const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-      useLazy({
-        getModule,
-        shouldImport: true,
-        onFinally: handleFinally,
-      }),
-    );
-
-    expect(renderHookResult.current.isLoading).toEqual(true);
-    expect(renderHookResult.current.result).toEqual(null);
-
-    await waitForNextUpdate();
-
-    expect(renderHookResult.current.isLoading).toEqual(false);
-    expect(renderHookResult.current.result).not.toBe(undefined);
-    expect(typeof renderHookResult.current.result).toBe('function');
-    expect(handleFinally).toHaveBeenCalledTimes(1);
   });
 
   it('should now how to handle and array of promises', async () => {
-    const handleFinally = jest.fn();
+    const shouldImport = true;
     const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-      useLazy({
-        getModule: getModules,
-        shouldImport: true,
-        onFinally: handleFinally,
-      }),
+      useLazy(getModules, shouldImport),
     );
 
     expect(renderHookResult.current.isLoading).toEqual(true);
@@ -73,7 +52,6 @@ describe('LazyComponent', () => {
     expect(Array.isArray(renderHookResult.current.result)).toBe(true);
     // @ts-ignore
     expect(renderHookResult.current.result.every(f => typeof f === 'function')).toBe(true);
-    expect(handleFinally).toHaveBeenCalledTimes(1);
   });
 
   describe('import other stuff besided React components', () => {
@@ -82,13 +60,9 @@ describe('LazyComponent', () => {
 
       const getUtil: SomeUtil = () => import('./utilExample');
 
-      const handleFinally = jest.fn();
+      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy({
-          getModule: getUtil,
-          shouldImport: true,
-          onFinally: handleFinally,
-        }),
+        useLazy(getUtil, shouldImport),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -101,7 +75,6 @@ describe('LazyComponent', () => {
       expect(typeof renderHookResult.current.result).toBe('function');
       // @ts-ignore - avoid Object is possibly "null" since it won't be like that
       expect(renderHookResult.current.result('очень', 'круто')).toBe('очень круто');
-      expect(handleFinally).toHaveBeenCalledTimes(1);
     });
 
     it('should import an object', async () => {
@@ -109,13 +82,9 @@ describe('LazyComponent', () => {
 
       const getUtil: UtilExample = () => import('./objectExample');
 
-      const handleFinally = jest.fn();
+      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy({
-          getModule: getUtil,
-          shouldImport: true,
-          onFinally: handleFinally,
-        }),
+        useLazy(getUtil, shouldImport),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -130,7 +99,6 @@ describe('LazyComponent', () => {
         name: 'Джеро',
         hobby: 'программирование',
       });
-      expect(handleFinally).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -141,11 +109,9 @@ describe('LazyComponent', () => {
       // @ts-ignore - just to avoid Typescript's "can't find module"
       const wrongModule = (): WrongModule => import('./wrong/Example'); // eslint-disable-line import/no-unresolved
 
+      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy({
-          getModule: wrongModule,
-          shouldImport: true,
-        }),
+        useLazy(wrongModule, shouldImport),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -175,11 +141,9 @@ describe('LazyComponent', () => {
         import('./AnotherWrongModule'), // eslint-disable-line import/no-unresolved
       ];
 
+      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy({
-          getModule: wrongModules,
-          shouldImport: true,
-        }),
+        useLazy(wrongModules, shouldImport),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
