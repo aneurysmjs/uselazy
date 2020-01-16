@@ -39,7 +39,7 @@ describe('LazyComponent', () => {
       useLazy({
         getModule,
         shouldImport: true,
-        onFynally: handleFinally,
+        onFinally: handleFinally,
       }),
     );
 
@@ -60,7 +60,7 @@ describe('LazyComponent', () => {
       useLazy({
         getModule: getModules,
         shouldImport: true,
-        onFynally: handleFinally,
+        onFinally: handleFinally,
       }),
     );
 
@@ -87,7 +87,7 @@ describe('LazyComponent', () => {
         useLazy({
           getModule: getUtil,
           shouldImport: true,
-          onFynally: handleFinally,
+          onFinally: handleFinally,
         }),
       );
 
@@ -114,7 +114,7 @@ describe('LazyComponent', () => {
         useLazy({
           getModule: getUtil,
           shouldImport: true,
-          onFynally: handleFinally,
+          onFinally: handleFinally,
         }),
       );
 

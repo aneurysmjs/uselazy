@@ -19,7 +19,7 @@ interface LazyObj<T> {
     | Array<Promise<{ default: SomeFn<T> }>>;
   /* eslint-enable @typescript-eslint/indent */
   shouldImport: boolean;
-  onFynally?: () => void;
+  onFinally?: () => void;
 }
 
 interface UseLazyResult<T> {
@@ -35,7 +35,7 @@ const initialState = {
 function useLazy<T>({
   getModule,
   shouldImport = false,
-  onFynally = (): void => {},
+  onFinally = (): void => {},
 }: LazyObj<T>): UseLazyResult<T> {
   const [AsyncModule, setAsyncModule] = useState<UseLazyResult<T>>(initialState);
 
@@ -70,7 +70,7 @@ function useLazy<T>({
       } catch (err) {
         setAsyncModule(err);
       } finally {
-        onFynally();
+        onFinally();
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
