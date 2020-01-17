@@ -12,7 +12,8 @@
     "semantic-release": "semantic-release",
     "lint": "eslint './src/**/*.{ts,tsx}'",
     "pretest": "yarn build",
-    "prepare": "yarn clean clean && yarn lint && yarn test"
+    "prepare": "yarn clean clean && yarn lint && yarn test",
+    "eslint-check": "eslint --print-config path/to/main.js | eslint-config-prettier-check"
   },
   "keywords": [
     "lazy loading",
