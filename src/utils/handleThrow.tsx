@@ -1,9 +1,14 @@
-export default function handleThrow<P>(errorOrObj: P): P {
-  if (errorOrObj) {
+import { State } from '../types';
+
+export default function handleThrow<P>(errorOrObj: State<P>): State<P> {
+  if (errorOrObj.result) {
     // rejection from `import()` for some reason is not and instance of Error
     // that's why the "Object.getPrototypeOf(errorOrObj).name"
-    if (errorOrObj instanceof Error || Object.getPrototypeOf(errorOrObj).name === 'Error') {
-      throw new Error(`useLazy ${errorOrObj}`);
+    if (
+      errorOrObj.result instanceof Error ||
+      Object.getPrototypeOf(errorOrObj.result).name === 'Error'
+    ) {
+      throw new Error(`useLazy ${errorOrObj.result}`);
     }
   }
   return errorOrObj;

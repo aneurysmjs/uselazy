@@ -1,35 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback, useReducer, Reducer } from 'react';
 
 import handleThrow from './utils/handleThrow';
 
-/**
- * I've learned this here:
- * @link https://github.com/Microsoft/TypeScript/pull/24897
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface SomeFn<U, V extends any[] = any[]> {
-  (param: U, ...rest: V): U | V;
-}
+import { GetModule, Action, State, FETCH_INIT, FETCH_SUCCESS, FETCH_FAILURE } from './types';
 
-interface UseLazyResult<T> {
-  isLoading: boolean;
-  result: T | SomeFn<T> | Array<SomeFn<T>> | null;
+function makeReducer<T>(): Reducer<State<T>, Action<T>> {
+  return (state: State<T>, action: Action<T>): State<T> => {
+    switch (action.type) {
+      case FETCH_INIT:
+        return {
+          ...state,
+          isLoading: true,
+        };
+      case FETCH_SUCCESS:
+        return {
+          ...state,
+          isLoading: false,
+          result: action.payload,
+        };
+      case FETCH_FAILURE:
+        return {
+          ...state,
+          isLoading: false,
+          result: action.payload,
+        };
+      default:
+        throw new Error();
+    }
+  };
 }
-
-/* eslint-disable @typescript-eslint/indent */
-type GetModule<T> = () =>
-  | Promise<{ default: T }>
-  | Promise<{ default: SomeFn<T> }>
-  | Array<Promise<{ default: SomeFn<T> }>>;
-/* eslint-enable @typescript-eslint/indent */
 
 const initialState = {
   isLoading: false,
   result: null,
 };
 
-function useLazy<T>(getModule: GetModule<T>, shouldImport = false): UseLazyResult<T> {
-  const [AsyncModule, setAsyncModule] = useState<UseLazyResult<T>>(initialState);
+function useLazy<T>(getModule: GetModule<T>, shouldImport = false): State<T> {
+  // Preserves identity of "getModule" so it can be safely add as a dependency of useEffect
+  const resolver = useCallback(getModule, []);
+
+  const reducer = makeReducer<T>();
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     (async (): Promise<void> => {
@@ -37,35 +49,25 @@ function useLazy<T>(getModule: GetModule<T>, shouldImport = false): UseLazyResul
         if (!shouldImport) {
           return;
         }
+        dispatch({ type: FETCH_INIT });
 
-        setAsyncModule({
-          isLoading: true,
-          result: null,
-        });
-
-        const module = await getModule();
+        const module = await resolver();
 
         if (module instanceof Array) {
           const modules = await Promise.all(module);
-          setAsyncModule({
-            isLoading: false,
-            result: modules.map(m => m.default),
-          });
+          dispatch({ type: FETCH_SUCCESS, payload: modules.map(m => m.default) });
         }
 
         if ('default' in module) {
-          setAsyncModule({
-            isLoading: false,
-            result: module.default,
-          });
+          dispatch({ type: FETCH_SUCCESS, payload: module.default });
         }
-      } catch (err) {
-        setAsyncModule(err);
+      } catch (error) {
+        dispatch({ type: FETCH_FAILURE, payload: error });
       }
     })();
-  }, []);
+  }, [resolver, shouldImport]);
 
-  return handleThrow(AsyncModule);
+  return handleThrow(state);
 }
 
 export default useLazy;

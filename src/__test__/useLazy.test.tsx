@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/indent, @typescript-eslint/ban-ts-ignore */
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { renderHook } from '@testing-library/react-hooks';
 
-import React, { ReactElement, FunctionComponent } from 'react';
+import { ReactElement } from 'react';
 
 import useLazy from '../useLazy';
 
@@ -14,17 +14,11 @@ type GetModules = () => Array<Promise<{ default: () => ReactElement }>>;
 
 const getModules: GetModules = () => [import('./Example'), import('./AnotherExample')];
 
-// eslint-disable-next-line react/prop-types
-const SomeWrapper: FunctionComponent = ({ children }) => <div>{children}</div>;
-
 describe('LazyComponent', () => {
   it('should render "null" at first and then resolve promise', async () => {
     const shouldImport = true;
-    const { result: renderHookResult, waitForNextUpdate } = renderHook(
-      () => useLazy(getModule, shouldImport),
-      {
-        wrapper: SomeWrapper,
-      },
+    const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
+      useLazy(getModule, shouldImport),
     );
 
     expect(renderHookResult.current.isLoading).toEqual(true);
