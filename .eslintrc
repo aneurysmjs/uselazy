@@ -22,9 +22,6 @@
     "react-hooks"
   ],
   "settings": {
-    "import/resolver": {
-      "extensions": [".js", ".jsx", ".ts", ".tsx"]
-    },
     "react": {
       "version": "detect"
     }
