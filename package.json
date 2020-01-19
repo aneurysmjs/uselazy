@@ -13,7 +13,7 @@
     "lint": "eslint './src/**/*.{ts,tsx}'",
     "pretest": "yarn build",
     "prepare": "yarn clean clean && yarn lint && yarn test",
-    "eslint-check": "eslint --print-config path/to/main.js | eslint-config-prettier-check"
+    "eslint-check": "eslint --print-config src/index.tsx | eslint-config-prettier-check"
   },
   "keywords": [
     "lazy loading",
