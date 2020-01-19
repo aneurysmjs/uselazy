@@ -64,7 +64,4 @@ dist
 lib
 es
 
-# ignore Typescript's generated files
-types/
-
 .DS_Store
