@@ -2,7 +2,13 @@ export const FETCH_INIT = 'FETCH_INIT';
 export const FETCH_SUCCESS = 'FETCH_SUCCESS';
 export const FETCH_FAILURE = 'FETCH_FAILURE';
 
-export type GetModule<T> = () => Promise<{ default: T }> | Array<Promise<{ default: T }>>;
+interface DefaultImport<T> {
+  default: T;
+}
+
+export interface GetModule<T> {
+  (): Promise<DefaultImport<T>> | Array<Promise<DefaultImport<T>>>;
+}
 
 export type Result<T> = T | Array<T> | null | Error;
 
