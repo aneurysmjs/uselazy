@@ -1,24 +1,29 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { renderHook } from '@testing-library/react-hooks';
 
-import { ReactElement } from 'react';
+import { ReactElement, useMemo } from 'react';
 
 import useLazy from '../useLazy';
 
 // type ExampleModule = () => Promise<typeof import('./Example')>;
-type ExampleModule = () => Promise<{ default: () => ReactElement }>;
+type ModuleType = Promise<{ default: () => ReactElement }>;
+type ExampleModule = () => ModuleType;
 
 const getModule: ExampleModule = () => import('./Example');
 
-type GetModules = () => Array<Promise<{ default: () => ReactElement }>>;
-
-const getModules: GetModules = () => [import('./Example'), import('./AnotherExample')];
+const getModules = [
+  (): ModuleType => import('./Example'),
+  (): ModuleType => import('./AnotherExample'),
+];
 
 describe('LazyComponent', () => {
   it('should render "null" at first and then resolve promise', async () => {
     const shouldImport = true;
     const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-      useLazy(getModule, shouldImport),
+      useLazy(
+        useMemo(() => [getModule], []),
+        shouldImport,
+      ),
     );
 
     expect(renderHookResult.current.isLoading).toEqual(true);
@@ -34,7 +39,11 @@ describe('LazyComponent', () => {
   it('should now how to handle and array of promises', async () => {
     const shouldImport = true;
     const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-      useLazy(getModules, shouldImport),
+      useLazy(
+        // @ts-ignore
+        useMemo(() => getModules, []),
+        shouldImport,
+      ),
     );
 
     expect(renderHookResult.current.isLoading).toEqual(true);
@@ -56,7 +65,10 @@ describe('LazyComponent', () => {
 
       const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(getUtil, shouldImport),
+        useLazy(
+          useMemo(() => [getUtil], []),
+          shouldImport,
+        ),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -78,7 +90,10 @@ describe('LazyComponent', () => {
 
       const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(getUtil, shouldImport),
+        useLazy(
+          useMemo(() => [getUtil], []),
+          shouldImport,
+        ),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -105,7 +120,10 @@ describe('LazyComponent', () => {
 
       const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(wrongModule, shouldImport),
+        useLazy(
+          useMemo(() => [wrongModule], []),
+          shouldImport,
+        ),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -124,15 +142,13 @@ describe('LazyComponent', () => {
     });
 
     it('should throw for multiple imports', async () => {
-      type WrongModules = () => Array<
-        // @ts-ignore - just to avoid Typescript's "can't find module"
-        Promise<typeof import('./Example') | typeof import('./AnotherWrongModule')>
-      >;
+      // @ts-ignore - just to avoid Typescript's "can't find module"
+      type AnotherWrongModuleType = typeof import('./AnotherWrongModule');
 
-      const wrongModules: WrongModules = () => [
-        import('./Example'),
+      const wrongModules = [
+        (): ModuleType => import('./Example'),
         // @ts-ignore - just to avoid Typescript's "can't find module"
-        import('./AnotherWrongModule'), // eslint-disable-line import/no-unresolved
+        (): AnotherWrongModuleType => import('./AnotherWrongModule'), // eslint-disable-line import/no-unresolved
       ];
 
       const shouldImport = true;

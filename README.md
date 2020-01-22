@@ -26,11 +26,13 @@ or
 
 ## API
 
+
 ```typescript
   // This it whats takes useLazy:
-  useLazy(
-    // function that returns a promise from a dynamic import
-    getModule: () => Promise<{ default: () => P }> | Array<Promise<{ default: () => P }>>,
+  useLazy<T>(
+    // array of functions that returns a promise from a dynamic import
+    // NOTE: please you should wrap this value inside of `useMemo`
+    importFns: Array<() => Promise<{ default: T }>>,
     // this is were you decided when to execute the import
     shouldImport: boolean
   );
@@ -46,13 +48,17 @@ const Text = () => <p> Here's your beer </p>;
 export default Text;
 
 // App.tsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import useLazy from 'uselazy';
+
+const imports = () => import('./Text');
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
   const { isLoading, result: SomeComponent } = useLazy(
-    () => import('./Text'),
+    // Preserves identity of "imports" so it can be safely add as a dependency of useEffect
+    // inside useLazy
+    useMemo(() => imports, []),
     shouldImport
   );
 
@@ -92,10 +98,14 @@ export default AnotherText;
 import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
+const imports = [ () => import('./Text'), () => import('./AnotherText')];
+
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
   const { isLoading, result: Components } = useLazy(
-    () => [import('./Text'), import('./AnotherText')],
+    // Preserves identity of "imports" so it can be safely add as a dependency of useEffect
+    // inside useLazy
+    useMemo(() => imports, []),
     shouldImport
   );
 
@@ -131,10 +141,14 @@ export default someUtils;
 import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
+const utilsImport = [() => import('./someUtils')];
+
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
   const { isLoading, result: utils } = useLazy(
-    () => import('./someUtils'),
+    // Preserves identity of "utilsImport" so it can be safely add as a dependency of useEffect
+    // inside useLazy
+    useMemo(() => utilsImport, []),
     shouldImport
   );
 
@@ -156,6 +170,16 @@ const App = () => {
   );
 };
 ```
+
+## NOTE
+
+The reason why I'm encouraging to wrap the imports array with `useMemo` is because of useEffect's array of dependencies,
+that triggers a re-render whatever they change, so if you DON'T wrap it, you'll get an infinite rerendering loop because,
+each render the imports array is different. [] === [] // false.
+
+so I giving the developer total control of this, he decides whether the array can change.
+
+more details here: [A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
 
 ## LICENSE
 
