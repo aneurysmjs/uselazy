@@ -2,9 +2,7 @@
 
 react hook for lazy load and code-split react components or whatever you want.
 
-NOTE: at the moment this ONLY supports dynamic imports for React components where's a default export.
-
-named exports will be handle soon.
+NOTE: useLazy now handles both dynamic and named imports.
 
 <br />
 
@@ -30,14 +28,17 @@ or
 ```typescript
   // This it whats takes useLazy:
   useLazy<T>(
-    // array of functions that returns a promise from a dynamic import
+    // array of functions that returns a promise from a dynamic import which
+    // could object with a default import or named import
     // NOTE: please you should wrap this value inside of `useMemo`
-    importFns: Array<() => Promise<{ default: T }>>,
+    importFns: Array<() => Promise<{ default: T } | { [K: string]: T }>>,
     // this is were you decided when to execute the import
     shouldImport: boolean
   );
 ```
 ## Usage
+
+### handles default import
 
 ``` jsx
 // Text.tsx
@@ -51,7 +52,7 @@ export default Text;
 import React, { useState, useMemo } from 'react';
 import useLazy from 'uselazy';
 
-const imports = () => import('./Text');
+const imports = [() => import('./Text')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
@@ -77,7 +78,45 @@ const App = () => {
 };
 ```
 
-### Also you can handle multiple imports
+### handles named import
+
+``` jsx
+// Text.tsx
+import React from 'react'
+
+export const BeerBear = () => <p> Bears loves beer </p>;
+
+// App.tsx
+import React, { useState, useMemo } from 'react';
+import useLazy from 'uselazy';
+
+const namedImports = [() => import('./Text')];
+
+const App = () => {
+  const [shouldImport, setShouldImport] = useState(false);
+  const { isLoading, result: BeerComponent } = useLazy(
+    // Preserves identity of "namedImports" so it can be safely add as a dependency of useEffect
+    // inside useLazy
+    useMemo(() => namedImports, []),
+    shouldImport
+  );
+
+  return (
+    <div>
+      <h1>I'm very lazy </h1>
+      <button onClick={() => setShouldImport(!shouldImport)}>
+        Buy me a beer 
+      </button>
+
+      {isLoading && <span>some spinner</span>}
+
+      {BeerComponent && <BeerComponent />}
+    </div>
+  );
+};
+```
+
+### It also can handle multiple imports
 
 ``` jsx
 // Text.tsx
@@ -98,7 +137,7 @@ export default AnotherText;
 import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
-const imports = [ () => import('./Text'), () => import('./AnotherText')];
+const imports = [() => import('./Text'), () => import('./AnotherText')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
