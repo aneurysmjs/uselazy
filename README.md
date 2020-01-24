@@ -29,7 +29,7 @@ or
   // This it whats takes useLazy:
   useLazy<T>(
     // array of functions that returns a promise from a dynamic import which
-    // could object with a default import or named import
+    // could be an object with a default import or named import
     // NOTE: please you should wrap this value inside of `useMemo`
     importFns: Array<() => Promise<{ default: T } | { [K: string]: T }>>,
     // this is were you decided when to execute the import
@@ -38,7 +38,7 @@ or
 ```
 ## Usage
 
-### handles default import
+### handles `default` import
 
 ``` jsx
 // Text.tsx
@@ -56,7 +56,7 @@ const imports = [() => import('./Text')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
-  const { isLoading, result: SomeComponent } = useLazy(
+  const { isLoading, result: TextComponent } = useLazy(
     // Preserves identity of "imports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => imports, []),
@@ -72,29 +72,29 @@ const App = () => {
 
       {isLoading && <span>some spinner</span>}
 
-      {SomeComponent && <SomeComponent />}
+      {TextComponent && <TextComponent />}
     </div>
   );
 };
 ```
 
-### handles named import
+### handles `named` imports
 
 ``` jsx
-// Text.tsx
+// Bears.tsx
 import React from 'react'
 
-export const BeerBear = () => <p> Bears loves beer </p>;
+export const Bears = () => <p> Bears loves beers </p>;
 
 // App.tsx
 import React, { useState, useMemo } from 'react';
 import useLazy from 'uselazy';
 
-const namedImports = [() => import('./Text')];
+const namedImports = [() => import('./Bears')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
-  const { isLoading, result: BeerComponent } = useLazy(
+  const { isLoading, result: BearsComponent } = useLazy(
     // Preserves identity of "namedImports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => namedImports, []),
@@ -110,13 +110,13 @@ const App = () => {
 
       {isLoading && <span>some spinner</span>}
 
-      {BeerComponent && <BeerComponent />}
+      {BearsComponent && <BearsComponent />}
     </div>
   );
 };
 ```
 
-### It also can handle multiple imports
+### Or you can handle both `default` and `named` imports
 
 ``` jsx
 // Text.tsx
@@ -126,18 +126,16 @@ const Text = () => <p> Here's your beer </p>;
 
 export default Text;
 
-// AnotherText.tsx
+// Bears.tsx
 import React from 'react'
 
-const AnotherText = () => <p> Another beer </p>;
-
-export default AnotherText;
+export const Bears = () => <p> Bears loves beers </p>;
 
 // App.tsx
 import React, { useState } from 'react';
 import useLazy from 'uselazy';
 
-const imports = [() => import('./Text'), () => import('./AnotherText')];
+const imports = [() => import('./Text'), () => import('./Bears')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
@@ -162,7 +160,7 @@ const App = () => {
   );
 };
 ```
-### or other stuff rather than React components
+### Or other stuff rather than React components
 
 ``` jsx
 // someUtils.ts
@@ -197,14 +195,13 @@ const App = () => {
         Buy me lots of beers
       </button>
 
+      {isLoading && <span>some spinner</span>}
+
       {utils && (
         <button onClick={() => utils.byMoreBeers(5)}>
           Buy me more beers for my friends!
         </button>
       )}
-
-      {isLoading && <span>some spinner</span>}
-
     </div>
   );
 };

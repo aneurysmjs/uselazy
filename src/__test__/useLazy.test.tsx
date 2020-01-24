@@ -6,6 +6,7 @@ import { ReactElement, useMemo } from 'react';
 import useLazy from '../useLazy';
 
 type ModuleType = Promise<{ default: () => ReactElement }>;
+
 type ExampleModule = () => ModuleType;
 
 const getModule: ExampleModule = () => import('./Example');
@@ -35,13 +36,12 @@ describe('useLazy', () => {
   describe('Named Imports', () => {
     it('should handle named imports', async () => {
       type NamedExampleType = typeof import('./NamedExample');
-      const getNamedImport = [(): Promise<NamedExampleType> => import('./NamedExample')];
+      const getNamedImport = (): Promise<NamedExampleType> => import('./NamedExample');
 
       const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
         useLazy(
-          // @ts-ignore
-          useMemo(() => getNamedImport, []),
+          useMemo(() => [getNamedImport], []),
           shouldImport,
         ),
       );
@@ -72,14 +72,13 @@ describe('useLazy', () => {
         };
       }
 
-      const getActions = [(): Promise<ReduxActions> => import('./actions')];
+      const getActions = (): Promise<ReduxActions> => import('./actions');
 
       const shouldImport = true;
 
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
         useLazy(
-          // @ts-ignore
-          useMemo(() => getActions, []),
+          useMemo(() => [getActions], []),
           shouldImport,
         ),
       );
@@ -94,8 +93,6 @@ describe('useLazy', () => {
       expect(typeof renderHookResult.current.result).toBe('object');
       expect(renderHookResult.current.result).toHaveProperty('action1');
       expect(renderHookResult.current.result).toHaveProperty('action2');
-      expect(typeof renderHookResult.current.result.action1).toBe('function');
-      expect(typeof renderHookResult.current.result.action2).toBe('function');
     });
   });
 

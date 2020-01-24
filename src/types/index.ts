@@ -26,7 +26,7 @@ export type NamedImport<T> = { [K in keyof T]: T[K] };
 /**
  * The result from a dynamic import could be a `default` import or a `named` import.
  */
-export type DynamicImportResult<T> = DefaultImport<T> & NamedImport<T>;
+export type DynamicImportResult<T> = DefaultImport<T> | NamedImport<T>;
 
 /**
  * The import function returns a promise from a dynamic import.
