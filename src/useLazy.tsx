@@ -36,7 +36,7 @@ function makeReducer<T>(): Reducer<State<T>, Action<T>> {
   };
 }
 
-function useLazy<T>(importFns: Array<ImportFn<T>>, shouldImport = false): State<T> {
+function useLazy<T>(importFns: Array<ImportFn<T>>, shouldImport = true): State<T> {
   const reducer = makeReducer<T>();
 
   const [state, dispatch] = useReducer(reducer, initialState);

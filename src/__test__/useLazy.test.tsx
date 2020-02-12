@@ -14,12 +14,8 @@ const getModule: ExampleModule = () => import('./Example');
 describe('useLazy', () => {
   describe('Default Imports', () => {
     it('should render "null" at first and then resolve promise', async () => {
-      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(
-          useMemo(() => [getModule], []),
-          shouldImport,
-        ),
+        useLazy(useMemo(() => [getModule], [])),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -38,12 +34,8 @@ describe('useLazy', () => {
       type NamedExampleType = typeof import('./NamedExample');
       const getNamedImport = (): Promise<NamedExampleType> => import('./NamedExample');
 
-      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(
-          useMemo(() => [getNamedImport], []),
-          shouldImport,
-        ),
+        useLazy(useMemo(() => [getNamedImport], [])),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -74,13 +66,8 @@ describe('useLazy', () => {
 
       const getActions = (): Promise<ReduxActions> => import('./actions');
 
-      const shouldImport = true;
-
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(
-          useMemo(() => [getActions], []),
-          shouldImport,
-        ),
+        useLazy(useMemo(() => [getActions], [])),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
@@ -107,9 +94,8 @@ describe('useLazy', () => {
         (): AnotherWrongModuleType => import('./AnotherWrongModule'), // eslint-disable-line import/no-unresolved
       ];
 
-      const shouldImport = true;
       const { result: renderHookResult, waitForNextUpdate } = renderHook(() =>
-        useLazy(wrongModules, shouldImport),
+        useLazy(wrongModules),
       );
 
       expect(renderHookResult.current.isLoading).toEqual(true);
