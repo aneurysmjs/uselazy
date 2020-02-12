@@ -8,12 +8,11 @@
     "clean": "./node_modules/.bin/rimraf dist es",
     "build": "rollup -c",
     "commit": "git-cz",
-    "test": "node scripts/test.js --env=jsdom",
+    "test": "jest",
     "semantic-release": "semantic-release",
     "lint": "eslint './src/**/*.{ts,tsx}'",
     "pretest": "yarn build",
-    "prepare": "yarn clean clean && yarn lint && yarn test",
-    "eslint-check": "eslint --print-config path/to/main.js | eslint-config-prettier-check"
+    "prepare": "yarn clean clean && yarn lint && yarn test"
   },
   "keywords": [
     "lazy loading",
@@ -24,7 +23,7 @@
   "main": "dist/uselazy.js",
   "unpkg": "dist/uselazy.js",
   "module": "es/uselazy.js",
-  "types": "dist/index.d.ts",
+  "types": "types/index.d.ts",
   "files": [
     "dist",
     "lib",
