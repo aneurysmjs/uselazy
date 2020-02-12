@@ -6,7 +6,6 @@ const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
 
 const paths = {
   dist: resolveApp('dist'),
-  dotenv: resolveApp('.env'),
   src: resolveApp('src'),
 };
 
