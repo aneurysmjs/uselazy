@@ -55,3 +55,7 @@ export type Action<T> =
   | { readonly type: typeof IMPORT_INIT }
   | { readonly type: typeof IMPORT_SUCCESS; payload: Result<T> }
   | { readonly type: typeof IMPORT_FAILURE; payload: Result<T> };
+
+export interface UseLazy<T> {
+  (importFns: Array<ImportFn<T>>, shouldImport: false): State<T>;
+}

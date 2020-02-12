@@ -10,6 +10,8 @@ const noDeclarationFiles = { compilerOptions: { declaration: false } };
 
 const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
 
+const extensions = ['.tsx'];
+
 export default [
   // ES
   {
@@ -27,7 +29,7 @@ export default [
         }
       }),
       nodeResolve({
-        extensions: ['.tsx'],
+        extensions,
       }),
       typescript({ tsconfigOverride: noDeclarationFiles }),
     ],
@@ -44,7 +46,7 @@ export default [
         }
       }),
       nodeResolve({
-        extensions: ['.tsx'],
+        extensions,
       }),
       replace({
         'process.env.NODE_ENV': JSON.stringify('production'),
@@ -82,7 +84,7 @@ export default [
       nodeResolve({
         extensions: ['.tsx']
       }),
-      typescript({ tsconfigOverride: noDeclarationFiles }),
+      typescript({ useTsconfigDeclarationDir: true }),
       replace({
         'process.env.NODE_ENV': JSON.stringify('development')
       })
@@ -109,7 +111,7 @@ export default [
         }
       }),
       nodeResolve({
-        extensions: ['.tsx'],
+        extensions,
       }),
       typescript({ tsconfigOverride: noDeclarationFiles }),
       replace({

@@ -16,14 +16,13 @@ NOTE: useLazy now handles both dynamic and named imports.
  npm install uselazy
 ```
 
-or 
+or
 
 ```
  yarn add uselazy
 ```
 
 ## API
-
 
 ```typescript
   // This it whats takes useLazy:
@@ -36,13 +35,14 @@ or
     shouldImport: boolean
   );
 ```
+
 ## Usage
 
 ### handles `default` import
 
-``` jsx
+```jsx
 // Text.tsx
-import React from 'react'
+import React from 'react';
 
 const Text = () => <p> Here's your beer </p>;
 
@@ -60,15 +60,13 @@ const App = () => {
     // Preserves identity of "imports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => imports, []),
-    shouldImport
+    shouldImport,
   );
 
   return (
     <div>
       <h1>I'm very lazy </h1>
-      <button onClick={() => setShouldImport(!shouldImport)}>
-        Buy me a beer 
-      </button>
+      <button onClick={() => setShouldImport(!shouldImport)}>Buy me a beer</button>
 
       {isLoading && <span>some spinner</span>}
 
@@ -80,9 +78,9 @@ const App = () => {
 
 ### handles `named` imports
 
-``` jsx
+```jsx
 // Bears.tsx
-import React from 'react'
+import React from 'react';
 
 export const Bears = () => <p> Bears loves beers </p>;
 
@@ -98,15 +96,13 @@ const App = () => {
     // Preserves identity of "namedImports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => namedImports, []),
-    shouldImport
+    shouldImport,
   );
 
   return (
     <div>
       <h1>I'm very lazy </h1>
-      <button onClick={() => setShouldImport(!shouldImport)}>
-        Buy me a beer 
-      </button>
+      <button onClick={() => setShouldImport(!shouldImport)}>Buy me a beer</button>
 
       {isLoading && <span>some spinner</span>}
 
@@ -118,16 +114,16 @@ const App = () => {
 
 ### Or you can handle both `default` and `named` imports
 
-``` jsx
+```jsx
 // Text.tsx
-import React from 'react'
+import React from 'react';
 
 const Text = () => <p> Here's your beer </p>;
 
 export default Text;
 
 // Bears.tsx
-import React from 'react'
+import React from 'react';
 
 export const Bears = () => <p> Bears loves beers </p>;
 
@@ -143,15 +139,13 @@ const App = () => {
     // Preserves identity of "imports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => imports, []),
-    shouldImport
+    shouldImport,
   );
 
   return (
     <div>
       <h1>I'm very lazy </h1>
-      <button onClick={() => setShouldImport(!shouldImport)}>
-        Buy me lots of beers
-      </button>
+      <button onClick={() => setShouldImport(!shouldImport)}>Buy me lots of beers</button>
 
       {isLoading && <span>some spinner</span>}
 
@@ -160,17 +154,18 @@ const App = () => {
   );
 };
 ```
+
 ### Or other stuff rather than React components
 
-``` jsx
+```jsx
 // someUtils.ts
 import React from 'react';
 
 const someUtils = {
   byMoreBeers(cuantity: number): string {
-    return `${cuantity} beers on the way ;)`
+    return `${cuantity} beers on the way ;)`;
   },
-}
+};
 
 export default someUtils;
 
@@ -186,21 +181,17 @@ const App = () => {
     // Preserves identity of "utilsImport" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => utilsImport, []),
-    shouldImport
+    shouldImport,
   );
 
   return (
     <div>
-      <button onClick={() => setShouldImport(!shouldImport)}>
-        Buy me lots of beers
-      </button>
+      <button onClick={() => setShouldImport(!shouldImport)}>Buy me lots of beers</button>
 
       {isLoading && <span>some spinner</span>}
 
       {utils && (
-        <button onClick={() => utils.byMoreBeers(5)}>
-          Buy me more beers for my friends!
-        </button>
+        <button onClick={() => utils.byMoreBeers(5)}>Buy me more beers for my friends!</button>
       )}
     </div>
   );

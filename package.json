@@ -24,10 +24,13 @@
   "main": "dist/uselazy.js",
   "unpkg": "dist/uselazy.js",
   "module": "es/uselazy.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "lib",
-    "es"
+    "es",
+    "src",
+    "types"
   ],
   "config": {
     "commitizen": {
