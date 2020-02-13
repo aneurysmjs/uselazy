@@ -12,6 +12,10 @@ const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.pee
 
 const extensions = ['.tsx'];
 
+const namedExports = {
+  react: ['useEffect', 'useState']
+};
+
 export default [
   // ES
   {
@@ -24,9 +28,7 @@ export default [
     external,
     plugins: [
       commonjs({
-        namedExports: {
-          react: ['useEffect', 'useState']
-        }
+        namedExports,
       }),
       nodeResolve({
         extensions,
@@ -41,9 +43,7 @@ export default [
     external,
     plugins: [
       commonjs({
-        namedExports: {
-          react: ['useEffect', 'useState']
-        }
+        namedExports,
       }),
       nodeResolve({
         extensions,
@@ -77,12 +77,10 @@ export default [
     external,
     plugins: [
       commonjs({
-        namedExports: {
-          react: ['useEffect', 'useState']
-        }
+        namedExports,
       }),
       nodeResolve({
-        extensions: ['.tsx']
+        extensions,
       }),
       typescript({ useTsconfigDeclarationDir: true }),
       replace({
@@ -106,9 +104,7 @@ export default [
     external,
     plugins: [
       commonjs({
-        namedExports: {
-          react: ['useEffect', 'useState']
-        }
+        namedExports,
       }),
       nodeResolve({
         extensions,
