@@ -80,7 +80,7 @@ export default [
         namedExports,
       }),
       nodeResolve({
-        extensions,
+        extensions
       }),
       typescript({ useTsconfigDeclarationDir: true }),
       replace({
