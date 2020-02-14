@@ -13,7 +13,7 @@ export const action1: Action<{ price: number }> = () => ({
 });
 
 export const action2: Action<{ url: string }> = () => ({
-  type: 'action-1',
+  type: 'action-2',
   payload: {
     url: 'https://site.com',
   },

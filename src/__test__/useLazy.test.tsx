@@ -3,6 +3,10 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import { ReactElement, useMemo } from 'react';
 
+import Example from './Example';
+import { NamedExample } from './NamedExample';
+import * as actions from './actions';
+
 import useLazy from '../useLazy';
 
 type ModuleType = Promise<{ default: () => ReactElement }>;
@@ -25,7 +29,10 @@ describe('useLazy', () => {
 
       expect(renderHookResult.current.isLoading).toEqual(false);
       expect(renderHookResult.current.result).not.toBe(undefined);
-      expect(typeof renderHookResult.current.result).toBe('function');
+
+      expect(Array.isArray(renderHookResult.current.result)).toBe(true);
+
+      expect(renderHookResult.current.result).toEqual(expect.arrayContaining([Example]));
     });
   });
 
@@ -45,7 +52,10 @@ describe('useLazy', () => {
 
       expect(renderHookResult.current.isLoading).toEqual(false);
       expect(renderHookResult.current.result).not.toBe(undefined);
-      expect(typeof renderHookResult.current.result).toBe('function');
+
+      expect(Array.isArray(renderHookResult.current.result)).toBe(true);
+
+      expect(renderHookResult.current.result).toEqual(expect.arrayContaining([NamedExample]));
     });
 
     it('should import an object with Redux actions', async () => {
@@ -77,9 +87,19 @@ describe('useLazy', () => {
 
       expect(renderHookResult.current.isLoading).toEqual(false);
       expect(renderHookResult.current.result).not.toBe(undefined);
-      expect(typeof renderHookResult.current.result).toBe('object');
-      expect(renderHookResult.current.result).toHaveProperty('action1');
-      expect(renderHookResult.current.result).toHaveProperty('action2');
+
+      expect(Array.isArray(renderHookResult.current.result)).toBe(true);
+
+      expect(renderHookResult.current.result).toEqual(expect.arrayContaining([actions]));
+
+      expect(renderHookResult.current.result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            action1: actions.action1,
+            action2: actions.action2,
+          }),
+        ]),
+      );
     });
   });
 

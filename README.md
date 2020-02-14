@@ -56,12 +56,14 @@ const imports = [() => import('./Text')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
-  const { isLoading, result: TextComponent } = useLazy(
+  const { isLoading, result } = useLazy(
     // Preserves identity of "imports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => imports, []),
     shouldImport,
   );
+
+  const [TextComponent] = result;
 
   return (
     <div>
@@ -92,12 +94,14 @@ const namedImports = [() => import('./Bears')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
-  const { isLoading, result: BearsComponent } = useLazy(
+  const { isLoading, result } = useLazy(
     // Preserves identity of "namedImports" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => namedImports, []),
     shouldImport,
   );
+
+  const [BearsComponent] = result;
 
   return (
     <div>
@@ -177,12 +181,14 @@ const utilsImport = [() => import('./someUtils')];
 
 const App = () => {
   const [shouldImport, setShouldImport] = useState(false);
-  const { isLoading, result: utils } = useLazy(
+  const { isLoading, result } = useLazy(
     // Preserves identity of "utilsImport" so it can be safely add as a dependency of useEffect
     // inside useLazy
     useMemo(() => utilsImport, []),
     shouldImport,
   );
+
+  const [utils] = result;
 
   return (
     <div>

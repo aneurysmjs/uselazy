@@ -53,8 +53,7 @@ function useLazy<T>(importFns: Array<ImportFn<T>>, shouldImport = true): State<T
 
         dispatch({
           type: IMPORT_SUCCESS,
-          // when there's more than one element, set and array, otherwise, just get the single element
-          payload: modules.length > 1 ? modules.map(handleImport) : handleImport(modules[0]),
+          payload: modules.map(handleImport),
         });
       } catch (error) {
         dispatch({ type: IMPORT_FAILURE, payload: error });
