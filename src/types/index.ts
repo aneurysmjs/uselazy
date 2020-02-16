@@ -2,10 +2,12 @@
  * Action type when a promise starts `resolving`.
  */
 export const IMPORT_INIT = 'IMPORT_INIT';
+
 /**
  * Action type when a promise is `fulfilled`.
  */
 export const IMPORT_SUCCESS = 'IMPORT_SUCCESS';
+
 /**
  * Action type when a promise is `rejected`.
  */
@@ -36,26 +38,23 @@ export interface ImportFn<T> {
 }
 
 /**
- * This are all the possible values `useLazy` handles.
+ * This are all the possible values `useLazy` handles which can be an array of
+ * the result of a `default import` or an array of the result of a `name import`.
  * */
-export type Result<T> = T | Array<T> | NamedImport<T> | Array<NamedImport<T>> | null | Error;
+export type Result<T> = Array<T> | Array<NamedImport<T>> | null;
 
 /**
  * This is the state that `useLazy` uses and returns when dealing with dynamic imports.
  */
-export interface State<T> {
+export interface UseLazyResult<T> {
   isLoading: boolean;
   result: Result<T>;
 }
 
 /**
- * Every action for every step when a dynamic import is transiti.
+ * Every action for every step when a dynamic import is transition.
  */
 export type Action<T> =
   | { readonly type: typeof IMPORT_INIT }
   | { readonly type: typeof IMPORT_SUCCESS; payload: Result<T> }
   | { readonly type: typeof IMPORT_FAILURE; payload: Result<T> };
-
-export interface UseLazy<T> {
-  (importFns: Array<ImportFn<T>>, shouldImport: false): State<T>;
-}

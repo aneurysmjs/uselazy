@@ -1,6 +1,6 @@
-import { State } from '../types';
+import { UseLazyResult } from '../types';
 
-export default function handleThrow<P>(errorOrObj: State<P>): State<P> {
+export default function handleThrow<P>(errorOrObj: UseLazyResult<P>): UseLazyResult<P> {
   if (errorOrObj.result) {
     // rejection from `import()` for some reason is not and instance of Error
     // that's why the "Object.getPrototypeOf(errorOrObj).name"
